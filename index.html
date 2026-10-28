@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MediMind AI — Your AI Health Information Companion. Discuss health concerns, explore symptoms, and understand general medical information.">
+  <title>MediMind AI — AI Medical Assistant</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- App Shell -->
+  <div class="app-layout">
+    
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" aria-hidden="true"></div>
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="app-sidebar" id="appSidebar" aria-label="Sidebar navigation">
+      
+      <!-- Sidebar Header / Brand -->
+      <div class="sidebar-header">
+        <div class="brand-badge">
+          <div class="brand-logo-icon" aria-hidden="true">
+            <svg viewBox="0 0 40 40" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="40" height="40" rx="10" fill="url(#brandGrad)" />
+              <path d="M16 8h8v7h7v8h-7v7h-8v-7H9v-8h7V8z" fill="#ffffff" />
+              <circle cx="20" cy="19.5" r="2.5" fill="#1a66ff" />
+              <circle cx="28" cy="11" r="1.5" fill="#ffffff" />
+              <path d="M28 8v1.5M28 12.5v1.5M25 11h1.5M29.5 11h1.5" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round"/>
+              <defs>
+                <linearGradient id="brandGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#1a66ff" />
+                  <stop offset="1" stop-color="#4f46e5" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <span class="brand-name">MediMind <span class="brand-ai">AI</span></span>
+            <span class="brand-tagline">Health Info Companion</span>
+          </div>
+        </div>
+        <button type="button" class="icon-btn sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Action Button: New Chat -->
+      <div class="sidebar-action-wrap">
+        <button type="button" class="btn btn-primary btn-new-chat" id="newChatBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>New Conversation</span>
+        </button>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="sidebar-nav" aria-label="Main Navigation">
+        <button type="button" class="nav-item active" data-view="chat" id="navAssistant">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span>Health Assistant</span>
+        </button>
+        <button type="button" class="nav-item" data-view="health-info" id="navHealthInfo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span>Health Information</span>
+        </button>
+        <button type="button" class="nav-item" data-view="about" id="navAbout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <span>About MediMind</span>
+        </button>
+      </nav>
+
+      <!-- Search Conversations -->
+      <div class="sidebar-search-section">
+        <div class="search-input-wrap">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="searchConversations" placeholder="Search conversations..." aria-label="Search conversation history" autocomplete="off">
+          <button type="button" id="clearSearchBtn" class="clear-search-btn" aria-label="Clear search" style="display:none;">✕</button>
+        </div>
+      </div>
+
+      <!-- Recent Conversations History -->
+      <div class="sidebar-history-section">
+        <div class="history-header">
+          <span class="history-title">Recent Conversations</span>
+          <span class="history-count" id="historyCount">0</span>
+        </div>
+        <div class="history-list" id="conversationList" role="list">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <div class="footer-links">
+          <button type="button" class="footer-link-btn" id="openDisclaimerBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <span>Medical Disclaimer</span>
+          </button>
+          <button type="button" class="footer-link-btn" id="openPrivacyBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>Privacy &amp; Data</span>
+          </button>
+        </div>
+        <button type="button" class="clear-all-btn" id="clearHistoryBtn" title="Clear all conversation history">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          <span>Clear Local History</span>
+        </button>
+      </div>
+
+      <!-- Collapse Toggle (Desktop) -->
+      <button type="button" class="sidebar-collapse-toggle" id="sidebarCollapseToggle" aria-label="Toggle sidebar collapse" title="Collapse / Expand sidebar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="main-wrapper">
+      
+      <!-- TOP MAIN HEADER -->
+      <header class="main-header" role="banner">
+        <div class="header-left">
+          <button type="button" class="icon-btn mobile-menu-btn" id="mobileMenuBtn" aria-label="Open sidebar menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="header-identity">
+            <h1 class="header-title" id="headerTitle">MediMind AI</h1>
+            <div class="header-status-badge" title="AI Medical Information Companion">
+              <span class="status-dot"></span>
+              <span class="status-text">AI Assistant · General Health Information</span>
+            </div>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button type="button" class="btn btn-outline btn-sm header-disclaimer-btn" id="headerDisclaimerBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <span>Disclaimer</span>
+          </button>
+          <button type="button" class="btn btn-primary btn-sm header-new-chat-btn" id="headerNewChatBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>New Chat</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Persistent Medical Safety Banner -->
+      <aside class="persistent-safety-strip" role="region" aria-label="Medical safety notice">
+        <div class="safety-strip-content">
+          <svg class="safety-strip-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span class="safety-strip-text">
+            <strong>Medical Notice:</strong> MediMind AI provides general health information and is not a substitute for professional medical care. In an emergency, call <strong>112</strong> (India) or your local emergency line immediately.
+          </span>
+        </div>
+      </aside>
+
+      <!-- VIEW 1: CHAT VIEW -->
+      <section class="view-panel active-view" id="chatView" aria-label="Conversation area">
+        
+        <!-- Welcome Screen (shown when no messages exist in current session) -->
+        <div class="welcome-screen" id="welcomeScreen">
+          <div class="welcome-container">
+            
+            <div class="welcome-hero-badge">
+              <div class="hero-icon-wrap" aria-hidden="true">
+                <svg viewBox="0 0 60 60" width="56" height="56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="60" height="60" rx="16" fill="url(#heroGrad)" />
+                  <path d="M25 12h10v10h10v10H35v10H25V32H15V22h10V12z" fill="#ffffff" />
+                  <circle cx="30" cy="27" r="3.5" fill="#1a66ff" />
+                  <circle cx="43" cy="17" r="2.5" fill="#ffffff" />
+                  <path d="M43 12v3M43 19v3M38 17h3M45 17h3" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+                  <defs>
+                    <linearGradient id="heroGrad" x1="0" y1="0" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#1a66ff" />
+                      <stop offset="0.5" stop-color="#3b82f6" />
+                      <stop offset="1" stop-color="#6366f1" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <h2 class="welcome-heading">How can I help you today?</h2>
+              <p class="welcome-subtext">
+                Ask a health question, describe your symptoms, or discuss a concern. I'll help you understand general health information and appropriate next steps.
+              </p>
+            </div>
+
+            <!-- 4 Clickable Suggestion Cards -->
+            <div class="suggestion-grid" role="group" aria-label="Suggested conversation starters">
+              
+              <!-- Card 1: Understand My Symptoms -->
+              <button type="button" class="suggestion-card" data-prompt="I'd like to understand some symptoms I've been experiencing: [describe what you feel, how long it has been occurring, and how severe it is]">
+                <div class="card-icon card-icon-symptoms" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                  </svg>
+                </div>
+                <div class="card-content">
+                  <h3 class="card-title">Understand My Symptoms</h3>
+                  <p class="card-desc">Describe your symptoms to explore potential explanations and next steps.</p>
+                </div>
+                <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+
+              <!-- Card 2: Ask a Health Question -->
+              <button type="button" class="suggestion-card" data-prompt="Could you explain general health information regarding [mention medical term, condition, or daily habit you have questions about]?">
+                <div class="card-icon card-icon-question" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                </div>
+                <div class="card-content">
+                  <h3 class="card-title">Ask a Health Question</h3>
+                  <p class="card-desc">Ask about medical concepts, wellness guidance, or preventative care.</p>
+                </div>
+                <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+
+              <!-- Card 3: Understand a Medical Report -->
+              <button type="button" class="suggestion-card" data-prompt="Could you help me understand the medical terms in my lab report? The report mentions: [paste specific values or phrases from your report]">
+                <div class="card-icon card-icon-report" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                  </svg>
+                </div>
+                <div class="card-content">
+                  <h3 class="card-title">Understand a Medical Report</h3>
+                  <p class="card-desc">Clarify medical terminology and routine lab values to prepare for doctor consultations.</p>
+                </div>
+                <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+
+              <!-- Card 4: Discuss a Skin Concern -->
+              <button type="button" class="suggestion-card" data-prompt="I have a skin concern: [describe appearance, color, location, duration, and whether it is itchy or painful]">
+                <div class="card-icon card-icon-skin" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                  </svg>
+                </div>
+                <div class="card-content">
+                  <h3 class="card-title">Discuss a Skin Concern</h3>
+                  <p class="card-desc">Describe a rash, spot, or irritation to learn about general causes and when to see a dermatologist.</p>
+                </div>
+                <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+
+            </div>
+
+            <!-- Welcome Disclaimer Box -->
+            <div class="welcome-disclaimer-box">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+              <div class="welcome-disclaimer-content">
+                <strong>Important Medical Boundary</strong>
+                <p>MediMind AI provides general health information and is not a real doctor or a replacement for professional medical care.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Active Chat Message History -->
+        <div class="messages-container" id="messagesContainer" style="display:none;" aria-live="polite">
+          <div class="messages-inner" id="messagesList">
+            <!-- Messages inserted dynamically via script.js -->
+          </div>
+        </div>
+
+        <!-- Floating Scroll to Bottom Button -->
+        <button type="button" class="scroll-bottom-btn" id="scrollBottomBtn" aria-label="Scroll to newest message" style="display:none;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        <!-- COMPOSER AREA (INPUT) -->
+        <div class="composer-container">
+          
+          <!-- Emergency Alert Banner (Shown dynamically when urgent red-flag keywords are entered) -->
+          <div class="emergency-alert-card" id="emergencyBanner" style="display:none;" role="alert">
+            <div class="emergency-alert-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </div>
+            <div class="emergency-alert-text">
+              <strong>Potential Medical Emergency Detected</strong>
+              <p>If you or someone nearby is experiencing chest pain, difficulty breathing, stroke signs, or sudden severe symptoms, do not wait for an AI answer. <strong>Call 112 (India) or your local emergency number immediately.</strong></p>
+            </div>
+          </div>
+
+          <!-- Attachment Preview Box -->
+          <div class="attachment-preview-wrapper" id="attachmentPreview" style="display:none;">
+            <div class="attachment-preview-card">
+              <div class="attachment-media-thumbnail" id="attachmentThumbWrap">
+                <!-- Image or Video Icon/Preview injected here -->
+              </div>
+              <div class="attachment-meta">
+                <span class="attachment-filename" id="attachmentFilename">file.png</span>
+                <span class="attachment-filesize" id="attachmentFilesize">0 KB</span>
+                <span class="attachment-status-badge" id="attachmentStatusBadge">Attached</span>
+              </div>
+              <button type="button" class="attachment-remove-btn" id="attachmentRemoveBtn" aria-label="Remove attachment" title="Remove attachment">
+                ✕
+              </button>
+            </div>
+            <!-- Upload context reminder -->
+            <div class="attachment-notice" id="attachmentNotice">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <span id="attachmentNoticeText">Images can provide useful context, but an AI assistant cannot reliably diagnose a medical condition from an image alone.</span>
+            </div>
+          </div>
+
+          <!-- Composer Form -->
+          <form class="composer-form" id="composerForm" onsubmit="return false;">
+            
+            <!-- Hidden File Inputs -->
+            <input type="file" id="imageFileInput" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="display:none;" aria-hidden="true">
+            <input type="file" id="videoFileInput" accept=".mp4,.webm,video/mp4,video/webm" style="display:none;" aria-hidden="true">
+
+            <div class="composer-box">
+              
+              <!-- Textarea -->
+              <textarea 
+                id="messageInput" 
+                class="composer-textarea" 
+                placeholder="Describe your health question or symptoms... (Press Enter to send, Shift+Enter for new line)"
+                rows="1"
+                aria-label="Message input for health questions"></textarea>
+
+              <!-- Controls / Action Row -->
+              <div class="composer-controls">
+                
+                <div class="attachment-buttons-group">
+                  <!-- Image Upload Button -->
+                  <button type="button" class="tool-btn" id="attachImageBtn" title="Attach an image (JPG, PNG, WEBP — up to 10 MB)" aria-label="Attach medical image">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    <span class="btn-label-desktop">Image</span>
+                  </button>
+
+                  <!-- Video Upload Button -->
+                  <button type="button" class="tool-btn" id="attachVideoBtn" title="Attach a video (MP4, WEBM — up to 25 MB)" aria-label="Attach medical video">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                      <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                    </svg>
+                    <span class="btn-label-desktop">Video</span>
+                  </button>
+                </div>
+
+                <!-- Send Button -->
+                <button type="button" class="send-btn" id="sendBtn" disabled aria-label="Send message" title="Send message">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                  </svg>
+                </button>
+
+              </div>
+            </div>
+
+            <!-- Composer Footnote -->
+            <div class="composer-footer">
+              <span class="composer-footnote">
+                MediMind AI provides health information for educational purposes. Never ignore or delay professional medical advice.
+              </span>
+            </div>
+          </form>
+
+        </div>
+      </section>
+
+      <!-- VIEW 2: HEALTH INFORMATION VIEW -->
+      <section class="view-panel" id="healthInfoView" style="display:none;" aria-label="Health Information and Guidance">
+        <div class="view-scroll-content">
+          <div class="content-container">
+            
+            <header class="section-hero">
+              <div class="section-tag">Patient Safety &amp; Guidance</div>
+              <h2 class="section-heading">Health Information &amp; Clinical Boundaries</h2>
+              <p class="section-lead">
+                Understanding how MediMind AI works, what it can responsibly assist with, and when human healthcare professionals are required.
+              </p>
+            </header>
+
+            <!-- Grid of Guidance Cards -->
+            <div class="info-sections-grid">
+              
+              <!-- What MediMind AI Can Help With -->
+              <article class="info-card">
+                <div class="info-card-header">
+                  <div class="info-badge green">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                  <h3>What MediMind AI Can Do</h3>
+                </div>
+                <ul class="info-list">
+                  <li><strong>Symptom Exploration:</strong> Discuss symptoms to understand potential categories of causes to discuss with a doctor.</li>
+                  <li><strong>Medical Terminology:</strong> Explain clinical terms, lab tests, and procedures in clear, everyday language.</li>
+                  <li><strong>Doctor Visit Preparation:</strong> Help formulate thoughtful questions and organize your symptom timeline before an appointment.</li>
+                  <li><strong>General Wellness:</strong> Provide evidence-aligned lifestyle, nutrition, hydration, and sleep hygiene information.</li>
+                  <li><strong>Follow-Up Clarifications:</strong> Answer subsequent questions to help you better understand health concepts.</li>
+                </ul>
+              </article>
+
+              <!-- What MediMind AI Cannot Do -->
+              <article class="info-card">
+                <div class="info-card-header">
+                  <div class="info-badge amber">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </div>
+                  <h3>What MediMind AI Cannot Do</h3>
+                </div>
+                <ul class="info-list">
+                  <li><strong>No Clinical Diagnosis:</strong> Cannot provide a definitive diagnosis or replace physical examinations.</li>
+                  <li><strong>No Medication Prescriptions:</strong> Cannot prescribe medications, adjust dosages, or recommend specific pharmaceuticals.</li>
+                  <li><strong>No Altering Prescribed Care:</strong> Will never recommend stopping or changing doctor-prescribed medications or treatments.</li>
+                  <li><strong>No Emergency Triage:</strong> Cannot manage life-threatening emergencies or critical trauma cases.</li>
+                  <li><strong>No Absolute Guarantees:</strong> AI models can make errors, hallucinate, or misinterpret nuances.</li>
+                </ul>
+              </article>
+
+              <!-- Emergency Guidance -->
+              <article class="info-card emergency-card">
+                <div class="info-card-header">
+                  <div class="info-badge red">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                  </div>
+                  <h3>Recognizing Medical Emergencies</h3>
+                </div>
+                <p class="info-card-desc">
+                  Seek emergency medical care immediately if you or someone else experiences any of the following critical warning signs:
+                </p>
+                <ul class="info-list alert-list">
+                  <li><strong>Sudden Chest Pain or Pressure:</strong> Squeezing sensation radiating to arm, jaw, neck, or back.</li>
+                  <li><strong>Signs of Stroke (F.A.S.T.):</strong> Face drooping, Arm weakness, Slurred speech, Time to call emergency.</li>
+                  <li><strong>Severe Shortness of Breath:</strong> Gasping, inability to speak full sentences, or blue lips.</li>
+                  <li><strong>Loss of Consciousness or Confusion:</strong> Sudden fainting, unresponsiveness, or abrupt cognitive changes.</li>
+                  <li><strong>Uncontrolled Bleeding or Severe Head Trauma:</strong> Significant injuries or profuse blood loss.</li>
+                </ul>
+                <div class="emergency-numbers-box">
+                  <span class="em-title">Emergency Helplines:</span>
+                  <div class="em-badges">
+                    <span class="em-badge"><strong>India:</strong> 112 / 102</span>
+                    <span class="em-badge"><strong>USA:</strong> 911</span>
+                    <span class="em-badge"><strong>UK:</strong> 999</span>
+                    <span class="em-badge"><strong>EU:</strong> 112</span>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Image & Video Processing Clarification -->
+              <article class="info-card">
+                <div class="info-card-header">
+                  <div class="info-badge blue">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                  </div>
+                  <h3>Image &amp; Video Capabilities</h3>
+                </div>
+                <p class="info-card-desc">
+                  MediMind AI prepares for multimodal medical discussions through n8n workflows and Google Gemini:
+                </p>
+                <ul class="info-list">
+                  <li><strong>Images:</strong> Once backend processing is active, image uploads (e.g. skin photos, lab values) serve as visual context to enrich the conversation.</li>
+                  <li><strong>Video Processing:</strong> Video analysis requires specialized backend frame extraction. If not yet configured, the system explicitly informs you so expectations remain accurate.</li>
+                  <li><strong>Visual Limitations:</strong> Skin lighting, camera resolution, angle, and compression can distort medical appearances. AI cannot replace in-person dermatological or clinical review.</li>
+                </ul>
+              </article>
+
+              <!-- Protecting Your Privacy -->
+              <article class="info-card">
+                <div class="info-card-header">
+                  <div class="info-badge teal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                  </div>
+                  <h3>Privacy Best Practices</h3>
+                </div>
+                <ul class="info-list">
+                  <li><strong>Do Not Share Personal Identifiers:</strong> Never provide your full legal name, home address, social security number, Aadhaar number, or phone numbers.</li>
+                  <li><strong>Scrub Medical Documents:</strong> Crop or redact patient names and hospital identification numbers before sharing report snippets.</li>
+                  <li><strong>Local Storage Control:</strong> Conversation titles and text messages are cached locally in your browser so you can revisit them. You can clear them at any time with one click.</li>
+                  <li><strong>No Image Persistence:</strong> Medical media files are not stored persistently in your browser's local storage.</li>
+                </ul>
+              </article>
+
+            </div>
+
+            <!-- Jump to Chat CTA -->
+            <div class="info-cta-box">
+              <div class="cta-text">
+                <h3>Have a health question or symptom to explore?</h3>
+                <p>Start a calm, informative conversation with MediMind AI now.</p>
+              </div>
+              <button type="button" class="btn btn-primary" id="ctaStartChatBtn">
+                Start Health Discussion
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: ABOUT VIEW -->
+      <section class="view-panel" id="aboutView" style="display:none;" aria-label="About MediMind AI">
+        <div class="view-scroll-content">
+          <div class="content-container">
+            
+            <header class="section-hero">
+              <div class="section-tag">About MediMind AI</div>
+              <h2 class="section-heading">Your AI Health Information Companion</h2>
+              <p class="section-lead">
+                Bridging the gap between confusing medical jargon and patient understanding through transparent, responsible artificial intelligence.
+              </p>
+            </header>
+
+            <div class="about-grid">
+              
+              <!-- Mission -->
+              <div class="about-card main-about-card">
+                <h3>Our Mission</h3>
+                <p>
+                  MediMind AI was created to provide accessible, empathetic, and clear general health guidance to everyday individuals. When people feel unwell or receive complex lab results, navigating medical terms online often leads to confusion or undue anxiety.
+                </p>
+                <p>
+                  Our goal is to assist users in structuring their health questions, understanding potential explanations, and learning what warning signs warrant timely consultation with a qualified medical professional.
+                </p>
+              </div>
+
+              <!-- Architecture -->
+              <div class="about-card">
+                <div class="about-card-badge">Technology Stack</div>
+                <h3>System Architecture</h3>
+                <ul class="tech-list">
+                  <li>
+                    <span class="tech-title">Modern Vanilla Frontend:</span>
+                    <span class="tech-sub">Fast, responsive, zero-dependency HTML5, CSS3, and modern JavaScript running cleanly in any browser.</span>
+                  </li>
+                  <li>
+                    <span class="tech-title">n8n Automation Engine:</span>
+                    <span class="tech-sub">Secure workflow orchestrator connecting the frontend request to enterprise AI services without exposing API credentials.</span>
+                  </li>
+                  <li>
+                    <span class="tech-title">Google Gemini Model:</span>
+                    <span class="tech-sub">Advanced multimodal reasoning engine designed to interpret clinical queries, medical terminology, and contextual health discussions.</span>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Core Safety Principles -->
+              <div class="about-card">
+                <div class="about-card-badge">Safety First</div>
+                <h3>Core Principles</h3>
+                <ul class="principles-list">
+                  <li><strong>Empathetic &amp; Calm:</strong> Healthcare inquiries can be stressful. We prioritize a reassuring, helpful tone.</li>
+                  <li><strong>Transparent Limitations:</strong> Never pretend to possess human clinical judgment or medical licenses.</li>
+                  <li><strong>Human-in-the-Loop:</strong> The AI serves as an informational bridge, not a substitute for a licensed physician.</li>
+                  <li><strong>No Commercial Influences:</strong> No sponsored pharmaceutical promotions or biased medical recommendations.</li>
+                </ul>
+              </div>
+
+            </div>
+
+            <!-- Boundary & Verification Disclaimer Notice -->
+            <div class="about-notice-box">
+              <h4>Regulatory and Professional Notice</h4>
+              <p>
+                MediMind AI is an informational technology application and has not been certified as a medical device or diagnostic instrument. It does not provide medical diagnoses, treatment plans, or emergency triage. For personal medical diagnoses and treatment plans, always consult a licensed doctor or healthcare professional.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- MODAL: MEDICAL DISCLAIMER -->
+  <div class="modal-overlay" id="disclaimerModal" role="dialog" aria-modal="true" aria-labelledby="disclaimerModalTitle" style="display:none;">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-icon warning-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
+        <h3 class="modal-title" id="disclaimerModalTitle">Medical Disclaimer</h3>
+        <button type="button" class="modal-close-btn" id="closeDisclaimerModal" aria-label="Close disclaimer modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-highlight">
+          <strong>MediMind AI is an AI-powered educational and health information tool. It is NOT a doctor, physician, hospital, or certified medical device.</strong>
+        </p>
+        <div class="disclaimer-points">
+          <div class="disclaimer-point">
+            <strong>1. General Information Only:</strong> All content, responses, suggestions, and explanations generated by MediMind AI are provided for general educational and informational purposes only.
+          </div>
+          <div class="disclaimer-point">
+            <strong>2. Not Medical Advice or Diagnosis:</strong> Never use information from this tool to diagnose, treat, cure, or prevent any illness, disease, injury, or medical condition. Always seek the advice of your physician or other qualified healthcare provider with any questions you may have regarding a medical condition.
+          </div>
+          <div class="disclaimer-point">
+            <strong>3. Never Delay Professional Care:</strong> Never disregard professional medical advice or delay seeking medical attention because of something you have read on this application.
+          </div>
+          <div class="disclaimer-point">
+            <strong>4. Medical Emergencies:</strong> If you think you may have a medical emergency, call emergency services immediately: <strong>112 in India</strong>, <strong>911 in the USA</strong>, <strong>999 in the UK</strong>, or go to the nearest emergency department.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="acknowledgeDisclaimerBtn">I Understand &amp; Agree</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PRIVACY & DATA -->
+  <div class="modal-overlay" id="privacyModal" role="dialog" aria-modal="true" aria-labelledby="privacyModalTitle" style="display:none;">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-icon info-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <h3 class="modal-title" id="privacyModalTitle">Privacy &amp; Local Storage</h3>
+        <button type="button" class="modal-close-btn" id="closePrivacyModal" aria-label="Close privacy modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-highlight">
+          Your privacy and health confidentiality are fundamental priorities. Here is how your data is handled:
+        </p>
+        <ul class="privacy-points-list">
+          <li><strong>No Mandatory Personal Information:</strong> MediMind AI does not ask for or require your name, address, telephone number, national ID, or insurance details.</li>
+          <li><strong>Local Browser Storage:</strong> To let you review previous discussions, conversation titles and text messages are stored strictly inside your browser's local storage (localStorage). This data stays on your device.</li>
+          <li><strong>Media Files Not Persisted:</strong> Uploaded images or previewed videos are processed in memory and are NOT saved permanently into your browser's local storage.</li>
+          <li><strong>Backend Communication:</strong> When an n8n webhook URL is configured, messages are transmitted directly over HTTPS to your designated workflow. No third-party ad trackers or analytics scripts are embedded.</li>
+          <li><strong>Instant Data Purge:</strong> You can completely erase all stored chats from your browser at any time using the "Clear Local History" button in the sidebar.</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="closePrivacyModalBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CLEAR HISTORY CONFIRMATION -->
+  <div class="modal-overlay" id="clearConfirmModal" role="dialog" aria-modal="true" aria-labelledby="clearConfirmTitle" style="display:none;">
+    <div class="modal-dialog modal-dialog-sm">
+      <div class="modal-header">
+        <div class="modal-icon danger-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </div>
+        <h3 class="modal-title" id="clearConfirmTitle">Clear Conversation History?</h3>
+        <button type="button" class="modal-close-btn" id="closeClearModal" aria-label="Close confirmation modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>This will delete all saved conversations from your browser's local storage. Active and historical discussions will be cleared immediately.</p>
+        <p><strong>This action cannot be undone.</strong></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelClearBtn">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmClearBtn">Yes, Clear History</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: IMAGE PREVIEW (FULL RESOLUTION) -->
+  <div class="modal-overlay image-preview-modal" id="imagePreviewModal" role="dialog" aria-modal="true" style="display:none;">
+    <div class="image-preview-modal-dialog">
+      <button type="button" class="image-modal-close" id="closeImagePreviewModal" aria-label="Close preview">✕</button>
+      <img src="" alt="Enlarged medical attachment preview" id="enlargedPreviewImg" class="enlarged-img">
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer" aria-live="assertive"></div>
+
+  <!-- Core JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>
